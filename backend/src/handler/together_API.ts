@@ -1,5 +1,6 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import { connectedSockets } from "../server";
+import { getSocketByUserId } from "./socket_handler";
 require("dotenv").config();
 
 const API_KEY = process.env.TOGETHER_API_KEY;
@@ -20,6 +21,22 @@ const config = {
   },
   responseType: "stream" as const,
 };
+
+const ImageConfig ={
+  method: "post",
+  url: "https://api.together.xyz/v1/images/generations",
+  headers: {
+    Authorization: `Bearer ${API_KEY}`,
+    Accept: {"Content-Type": "application/json"},
+  },
+  data: {
+    model: "black-forest-labs/FLUX.1-kontext-pro",
+    prompt: 'Cats eating popcorn',
+    steps: 10,
+    n: 4,
+  },
+
+}
 
 function handleStreamResponse(response: AxiosResponse, socket: any) {
 
@@ -66,14 +83,14 @@ function handleStreamResponse(response: AxiosResponse, socket: any) {
   });
 }
 
-export const getAIResponse = (bodydata:any) => {
-  config.data.messages[0].content = bodydata.content;
+export const getAIResponse = (SocketId:any,Message:any) => {
+  config.data.messages[0].content = Message;
   axios(config)
     .then((response) => {
       let steamresponse;
-      for (const socket of connectedSockets.values()) {
-        steamresponse = handleStreamResponse(response, socket);
-      }
+      // for (const socket of connectedSockets.values()) {
+        steamresponse = handleStreamResponse(response, getSocketByUserId(SocketId));
+      // }
       return steamresponse;
     })
     .catch((error) => {
@@ -81,3 +98,19 @@ export const getAIResponse = (bodydata:any) => {
       throw new Error("Failed to fetch AI response from Together API");
     });
 };
+
+// export const getAIResponse = (bodydata:any) => {
+//   config.data.messages[0].content = bodydata.content;
+//   axios(config)
+//     .then((response) => {
+//       let steamresponse;
+//       for (const socket of connectedSockets.values()) {
+//         steamresponse = handleStreamResponse(response, socket);
+//       }
+//       return steamresponse;
+//     })
+//     .catch((error) => {
+//       console.error("Error in getAIResponse:", error);
+//       throw new Error("Failed to fetch AI response from Together API");
+//     });
+// };
