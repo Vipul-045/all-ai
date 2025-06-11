@@ -7,6 +7,8 @@ import { Server } from "socket.io";
 import { Socket } from "dgram";
 import { getAIResponse } from "./handler/together_API";
 import { addUserSocket, removeUserSocket } from "./handler/socket_handler";
+import Urouter from "./routers/user_router";
+import { dbconnection } from "./db/db_connection";
 require("dotenv").config();
 const app = express();
 const server = http.createServer(app);
@@ -17,12 +19,21 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.use("/user", Urouter);
 
 const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-let userId:any;
+let userId: any;
+
+dbconnection()
+  .then((data) => {
+    console.log("MongoDB connected successfully");
+  })
+  .catch((err) => {
+    console.log("erro while connecting db");
+  });
 
 io.on("connection", (socket) => {
   console.log("A client connected:", socket.id);
@@ -32,10 +43,8 @@ io.on("connection", (socket) => {
   addUserSocket(socket.id, socket);
 
   socket.on("input", (data) => {
-
     getAIResponse(socket.id, data);
   });
-
 
   socket.on("disconnect", () => {
     if (userId) removeUserSocket(userId);
@@ -43,8 +52,6 @@ io.on("connection", (socket) => {
     console.log("Client disconnected:", socket.id);
   });
 });
-
-
 
 server.listen(3000, () => {
   console.log("Socket server running on http://localhost:3000");
