@@ -22,7 +22,6 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-export const connectedSockets = new Map<string, any>(); // used here hasmap
 let userId:any;
 
 io.on("connection", (socket) => {

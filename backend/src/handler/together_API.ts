@@ -1,5 +1,4 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
-import { connectedSockets } from "../server";
 import { getSocketByUserId } from "./socket_handler";
 require("dotenv").config();
 
@@ -40,11 +39,6 @@ const ImageConfig ={
 
 function handleStreamResponse(response: AxiosResponse, socket: any) {
 
-  console.log(
-    "Streaming response started",
-    response.status,
-    response.statusText
-  );
   let currenttext = "";
   let halftext = "";
   response.data.on("data", (chunk: any) => {
@@ -64,7 +58,6 @@ function handleStreamResponse(response: AxiosResponse, socket: any) {
             halftext = "";
           }
           let text = JSON.parse(currenttext.split("data: ")[1]).choices[0].text;
-          console.log(text);
           socket.emit("live-data", { message: text });
         }
       });
