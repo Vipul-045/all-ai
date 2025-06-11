@@ -42,19 +42,14 @@ function handleStreamResponse(response: AxiosResponse, socket: any) {
   let currenttext = "";
   let halftext = "";
   response.data.on("data", (chunk: any) => {
-    // console.log(typeof chunk);
-    // console.log("chunk", chunk);
     let data = chunk.toString();
 
     try {
       data.split("\n").forEach((line: string) => {
         if (line != "") {
-          // console.log('Received line:', line);
           currenttext = line;
-          // console.log("halftext",halftext);
           if (halftext != "") {
             currenttext = halftext + currenttext;
-            // console.log("murged text", currenttext);
             halftext = "";
           }
           let text = JSON.parse(currenttext.split("data: ")[1]).choices[0].text;
@@ -63,7 +58,6 @@ function handleStreamResponse(response: AxiosResponse, socket: any) {
       });
     } catch (error) {
       halftext = currenttext;
-      // console.error('Error parsing chunk:', error);
     }
   });
 
@@ -81,9 +75,7 @@ export const getAIResponse = (SocketId:any,Message:any) => {
   axios(config)
     .then((response) => {
       let steamresponse;
-      // for (const socket of connectedSockets.values()) {
         steamresponse = handleStreamResponse(response, getSocketByUserId(SocketId));
-      // }
       return steamresponse;
     })
     .catch((error) => {
@@ -91,19 +83,3 @@ export const getAIResponse = (SocketId:any,Message:any) => {
       throw new Error("Failed to fetch AI response from Together API");
     });
 };
-
-// export const getAIResponse = (bodydata:any) => {
-//   config.data.messages[0].content = bodydata.content;
-//   axios(config)
-//     .then((response) => {
-//       let steamresponse;
-//       for (const socket of connectedSockets.values()) {
-//         steamresponse = handleStreamResponse(response, socket);
-//       }
-//       return steamresponse;
-//     })
-//     .catch((error) => {
-//       console.error("Error in getAIResponse:", error);
-//       throw new Error("Failed to fetch AI response from Together API");
-//     });
-// };

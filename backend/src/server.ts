@@ -36,11 +36,6 @@ io.on("connection", (socket) => {
     getAIResponse(socket.id, data);
   });
 
-  // Emit data continuously
-  //   const interval = setInterval(() => {
-  //     const data = { message: "Live data " + new Date().toISOString() };
-  //     socket.emit('live-data', data);
-  //   }, 2000);
 
   socket.on("disconnect", () => {
     if (userId) removeUserSocket(userId);
@@ -50,7 +45,6 @@ io.on("connection", (socket) => {
 });
 
 
-// app.use("", GPTRouter);
 
 server.listen(3000, () => {
   console.log("Socket server running on http://localhost:3000");
