@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, response, Response, Router } from "express";
 import { createUser, loginuser } from "../handler/routes_handler/user_handler";
 const multer = require("multer");
 
@@ -17,6 +17,12 @@ Urouter.post("", mymulter.none(), async (req: Request, res: Response) => {
     console.log("Router: Error While creating user", err);
     res.status(500).send({ error: "Error while creating user" });
   }
+});
+
+Urouter.post("", mymulter.none(), async (req: Request, res: Response) => {
+  const userbodydata = req.body;
+const response = await createUser(userbodydata)
+  res.status(404).send(response);
 });
 
 Urouter.post("/login", mymulter.none(), async (req: Request, res: Response) => {

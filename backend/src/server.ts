@@ -5,7 +5,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { Socket } from "dgram";
-import { getAIResponse } from "./handler/together_API";
+import { getAIImageResponse, getAIResponse } from "./handler/together_API";
 import { addUserSocket, removeUserSocket } from "./handler/socket_handler";
 import Urouter from "./routers/user_router";
 import { dbconnection } from "./db/db_connection";
@@ -52,6 +52,17 @@ io.on("connection", (socket) => {
     console.log("Client disconnected:", socket.id);
   });
 });
+
+const getrespone = async () =>{
+  try {
+    const response = await getAIImageResponse("how are you");
+    console.log("respsone",response);
+  } catch (error) {
+    console.error("Error fetching AI response:", error);
+  }
+}
+
+getrespone();
 
 server.listen(3000, () => {
   console.log("Socket server running on http://localhost:3000");
