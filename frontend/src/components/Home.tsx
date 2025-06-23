@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { SendInputText } from "../services/InputData_Controller";
 import socket from "../services/socket";
 import "./home.css"
-
+import { formatOutput } from "../services/OutPutformater";
+import parse from 'html-react-parser';
 
 
 const HomeData = () => {
@@ -10,13 +11,17 @@ const HomeData = () => {
     const [inputvalue, setInputvalue] = useState("");
     const [outputValue, setOutPutValue] = useState("");
 
-    const listener = (msg: { message: string }) => {
-        console.log("msg", msg);
-        setOutPutValue(prev => prev + msg.message);
+    const listener = async (msg: { message: string }) => {
+        console.log("chunks :-", msg);
+        
+        const formated_data = await formatOutput(msg.message);
+        console.log("formated_data",formated_data);
+        setOutPutValue(prev => prev + formated_data);
     };
 
 
     useEffect(() => {
+        // console.log("converted",myConvertLatex("6.674 \\times 10^{-11} \\, \\text{N} \\cdot \\text{m}^2/\\text{kg}^2"));
         console.log("output on line data");
         socket.on("live-data", listener);
 
@@ -29,7 +34,7 @@ const HomeData = () => {
     return <>
         <div className="chat-container">
             <div className="chat-output">
-                <p>{outputValue}</p>
+                <div style={{overflow:"scroll"}} >{parse(outputValue)}</div>
             </div>
 
             <div className="chat-input-wrapper">
