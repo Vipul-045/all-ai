@@ -1,10 +1,6 @@
-import { Request, Response } from "express";
-// import GPTRouter from "./router/userInput";
-
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
-import { Socket } from "dgram";
 import { getAIResponse } from "./handler/together_API";
 import { addUserSocket, removeUserSocket } from "./handler/socket_handler";
 import Urouter from "./routers/user_router";
@@ -53,6 +49,20 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
+const os = require('os');
+
+// Get your local network IP
+const interfaces = os.networkInterfaces();
+let localIP = 'localhost';
+for (const iface of Object.values(interfaces)) {
+  console.log("iface",iface);
+  // for (const details of iface || []) {
+  //   if (details.family === 'IPv4' && !details.internal) {
+  //     localIP = details.address;
+  //   }
+  // }
+}
+
+server.listen(3000,'0.0.0.0', () => {
   console.log("Socket server running on http://localhost:3000");
 });
