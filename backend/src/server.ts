@@ -49,19 +49,6 @@ io.on("connection", (socket) => {
   });
 });
 
-const os = require('os');
-
-// Get your local network IP
-const interfaces = os.networkInterfaces();
-let localIP = 'localhost';
-for (const iface of Object.values(interfaces)) {
-  console.log("iface",iface);
-  // for (const details of iface || []) {
-  //   if (details.family === 'IPv4' && !details.internal) {
-  //     localIP = details.address;
-  //   }
-  // }
-}
 
 server.listen(3000,'0.0.0.0', () => {
   console.log("Socket server running on http://localhost:3000");
