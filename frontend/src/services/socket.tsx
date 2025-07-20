@@ -1,5 +1,8 @@
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:3000'); // Replace with your server URL
+// const BackendLink = "http://192.168.58.41:3000";
+const BackendLink = 'http://localhost:3000';
+
+const socket = io(BackendLink); // Replace with your server URL
 
 export default socket;

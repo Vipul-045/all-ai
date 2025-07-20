@@ -1,11 +1,8 @@
-import { Request, Response } from "express";
-// import GPTRouter from "./router/userInput";
-
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { Socket } from "dgram";
-import { getAIImageResponse, getAIResponse } from "./handler/together_API";
+import { getAIResponse } from "./handler/together_API";
 import { addUserSocket, removeUserSocket } from "./handler/socket_handler";
 import Urouter from "./routers/user_router";
 import { dbconnection } from "./db/db_connection";
@@ -64,6 +61,7 @@ const getrespone = async () =>{
 
 getrespone();
 
-server.listen(3000, () => {
+
+server.listen(3000,'0.0.0.0', () => {
   console.log("Socket server running on http://localhost:3000");
 });
