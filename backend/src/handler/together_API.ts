@@ -75,8 +75,8 @@ export const getAIResponse = (SocketId:any,Message:any) => {
   axios(config)
     .then((response) => {
       let steamresponse;
-       // steamresponse = handleStreamResponse(response, getSocketByUserId(SocketId));
-        steamresponse =  handlestreamResponseLocal(getSocketByUserId(SocketId));
+       steamresponse = handleStreamResponse(response, getSocketByUserId(SocketId));
+        // steamresponse =  handlestreamResponseLocal(getSocketByUserId(SocketId));
       return steamresponse;
     })
     .catch((error) => {

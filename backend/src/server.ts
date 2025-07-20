@@ -36,12 +36,14 @@ io.on("connection", (socket) => {
 
   userId = socket.id;
 
+  socket.setMaxListeners(100); // max hundrad lisner 
+
   addUserSocket(socket.id, socket);
 
   socket.on("input", (data) => {
     getAIResponse(socket.id, data);
   });
-
+  
   socket.on("disconnect", () => {
     if (userId) removeUserSocket(userId);
     console.log(`User ${userId} disconnected`);

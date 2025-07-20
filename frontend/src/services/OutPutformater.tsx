@@ -72,6 +72,8 @@ function murgetwochuckattime(chuckData: string) {
 function headingFormater(chuckData: string): string {
     let headingMatch: RegExpMatchArray | null = null;
     let UnOrderListEnd = "";
+    let isheading = '';
+    //chuckData ### **2. isheading ###
 
     while (chuckData.includes("#")) {
         if (!isheading.includes("#")) {
