@@ -72,9 +72,15 @@ function murgetwochuckattime(chuckData: string) {
 function headingFormater(chuckData: string): string {
     let headingMatch: RegExpMatchArray | null = null;
     let UnOrderListEnd = "";
+    // isheading = '';
+    //chuckData ### **2. isheading ###
 
     while (chuckData.includes("#")) {
+        console.log("isheading",isheading);
         if (!isheading.includes("#")) {
+            headingMatch = chuckData.match(/(.*?)\s*(#{1,6})\s*(.+?)\s*$/);
+        }
+        else{
             headingMatch = chuckData.match(/(.*?)\s*(#{1,6})\s*(.+?)\s*$/);
         }
 
@@ -238,8 +244,7 @@ const FormulaMatch = (chuckData: string): string => {
 
     if (match) {
         const latextData = myConvertLatex(match[1]);
-
-        chuckData = chuckData.replace(/(\\[\\[\\(])\s*([\s\S]*?)\s*(\\[\]\\)])/, (open, close) => {
+        chuckData = chuckData.replace(/(\\[\\[\\(])\s*([\s\S]*?)\s*(\\[\]\\)])/, (match, open, inner, close) => {
             return `${open} ${latextData} ${close}`;
         });
     }

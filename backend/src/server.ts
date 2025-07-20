@@ -1,7 +1,6 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
-import { Socket } from "dgram";
 import { getAIResponse } from "./handler/together_API";
 import { addUserSocket, removeUserSocket } from "./handler/socket_handler";
 import Urouter from "./routers/user_router";
@@ -37,29 +36,20 @@ io.on("connection", (socket) => {
 
   userId = socket.id;
 
+  socket.setMaxListeners(100); // max hundrad lisner 
+
   addUserSocket(socket.id, socket);
 
   socket.on("input", (data) => {
     getAIResponse(socket.id, data);
   });
-
+  
   socket.on("disconnect", () => {
     if (userId) removeUserSocket(userId);
     console.log(`User ${userId} disconnected`);
     console.log("Client disconnected:", socket.id);
   });
 });
-
-const getrespone = async () =>{
-  try {
-    const response = await getAIImageResponse("how are you");
-    console.log("respsone",response);
-  } catch (error) {
-    console.error("Error fetching AI response:", error);
-  }
-}
-
-getrespone();
 
 
 server.listen(3000,'0.0.0.0', () => {

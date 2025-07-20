@@ -21,32 +21,15 @@ const config = {
   responseType: "stream" as const,
 };
 
-const config2 = {
-  method: "post",
-  url: "https://api.together.xyz/v1/chat/completions",
-  headers: {
-    Authorization: `Bearer ${API_KEY}`,
-    Accept: "text/event-stream",
-    "Content-Type": "application/json",
-  },
-  data: {
-    model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
-    stream: true,
-    messages: [{ role: "user", content: "What's the weather" }],
-    context_length_exceeded_behavior: "truncate",
-  },
-  responseType: "stream" as const,
-};
-
 const ImageConfig ={
   method: "post",
   url: "https://api.together.xyz/v1/images/generations",
   headers: {
     Authorization: `Bearer ${API_KEY}`,
-    "Content-Type": "application/json",
+    Accept: {"Content-Type": "application/json"},
   },
   data: {
-    model: "black-forest-labs/FLUX.1-dev",
+    model: "black-forest-labs/FLUX.1-kontext-pro",
     prompt: 'Cats eating popcorn',
     steps: 10,
     n: 4,
@@ -60,7 +43,6 @@ function handleStreamResponse(response: AxiosResponse, socket: any) {
   let halftext = "";
   response.data.on("data", (chunk: any) => {
     let data = chunk.toString();
-    console.log(data);
 
     try {
       data.split("\n").forEach((line: string) => {
@@ -89,12 +71,12 @@ function handleStreamResponse(response: AxiosResponse, socket: any) {
 }
 
 export const getAIResponse = (SocketId:any,Message:any) => {
-  config2.data.messages[0].content = Message;
-  axios(config2)
+  config.data.messages[0].content = Message;
+  axios(config)
     .then((response) => {
       let steamresponse;
-       // steamresponse = handleStreamResponse(response, getSocketByUserId(SocketId));
-        steamresponse =  handlestreamResponseLocal(getSocketByUserId(SocketId));
+       steamresponse = handleStreamResponse(response, getSocketByUserId(SocketId));
+        // steamresponse =  handlestreamResponseLocal(getSocketByUserId(SocketId));
       return steamresponse;
     })
     .catch((error) => {
@@ -126,18 +108,3 @@ const socketInterval = setInterval(() => {
 
 }, interval);
 }
-
-export const getAIImageResponse = (Message:any) => {
-  // ImageConfig.data.messages[0].content = Message;
-  axios(ImageConfig)
-    .then((response) => {
-      // let steamresponse;
-      //   steamresponse = handleStreamResponse(response, getSocketByUserId(SocketId));
-      // return steamresponse;
-      return response.data;
-    })
-    .catch((error) => {
-      console.error("Error in getAIImageResponse:", error);
-      throw new Error("Failed to fetch AI response from Together API");
-    });
-};
