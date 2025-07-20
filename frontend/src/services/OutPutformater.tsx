@@ -238,7 +238,8 @@ const FormulaMatch = (chuckData: string): string => {
 
     if (match) {
         const latextData = myConvertLatex(match[1]);
-        chuckData = chuckData.replace(/(\\[\\[\\(])\s*([\s\S]*?)\s*(\\[\]\\)])/, ( open, close) => {
+
+        chuckData = chuckData.replace(/(\\[\\[\\(])\s*([\s\S]*?)\s*(\\[\]\\)])/, (open, close) => {
             return `${open} ${latextData} ${close}`;
         });
     }
