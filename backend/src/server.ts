@@ -8,7 +8,6 @@ import { dbconnection } from "./db/db_connection";
 require("dotenv").config();
 const app = express();
 const server = http.createServer(app);
-
 const cors = require("cors");
 const port = process.env.PORT || 3000;
 
@@ -43,6 +42,11 @@ io.on("connection", (socket) => {
   socket.on("input", (data) => {
     getAIResponse(socket.id, data);
   });
+
+  socket.on("test",(data)=>{
+    // console.log("test input");
+    console.log("data",data);
+  })
   
   socket.on("disconnect", () => {
     if (userId) removeUserSocket(userId);
@@ -51,6 +55,9 @@ io.on("connection", (socket) => {
   });
 });
 
+app.get('',(req,res)=>{
+  res.status(200).send({'message':"get request is working"});
+})
 
 server.listen(3000,'0.0.0.0', () => {
   console.log("Socket server running on http://localhost:3000");

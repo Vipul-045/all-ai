@@ -10,12 +10,13 @@ const HomeData = () => {
 
     const [inputvalue, setInputvalue] = useState("");
     const [outputValue, setOutPutValue] = useState("");
+    const [selectedModel, setSelectedModel] = useState("deepseek");
 
     const listener = async (msg: { message: string }) => {
         console.log("chunks :-", msg);
-        
+
         const formated_data = await formatOutput(msg.message);
-        console.log("formated_data",formated_data);
+        console.log("formated_data", formated_data);
         setOutPutValue(prev => prev + formated_data);
     };
 
@@ -46,6 +47,14 @@ const HomeData = () => {
                     </p>
                 </div>
                 <div className="border-black border-1 min-w-2/4 flex justify-between">
+                    <select
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        className="border px-3 py-2 rounded"
+                    >
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="gemini">Gemini</option>
+                    </select>
                     <div className="items-center space-x-2 flex">
                         <input
                             className="bg-#FFFFFF w-3xl hover:bg-gray-900 text-#1F2937 px-4 py-4 text-md"
@@ -61,7 +70,7 @@ const HomeData = () => {
                                 alert("Please enter a valid input.");
                                 return;
                             }
-                            SendInputText(inputvalue);
+                            SendInputText(inputvalue, selectedModel);
                             setInputvalue("");
                         }}
                     >
