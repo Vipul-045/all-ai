@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const API_KEY = process.env.TOGETHER_API_KEY;
 const GAPI_KEY = process.env.GEMINI_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 const configdeepseek = {
   method: "post",
@@ -22,6 +23,44 @@ const configdeepseek = {
     context_length_exceeded_behavior: "truncate",
   },
   responseType: "stream" as const,
+};
+
+const deepseekconfig = {
+  method: "post",
+  url: "https://api.deepseek.com/chat/completions",
+  headers: {
+    Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+    Accept: "text/event-stream",
+    "Content-Type": "application/json",
+  },
+  data: {
+    messages: [
+      {
+        content: "You are a helpful assistant",
+        role: "system",
+      },
+      {
+        content: "Hi",
+        role: "user",
+      },
+    ],
+    model: "deepseek-chat",
+    frequency_penalty: 0,
+    max_tokens: 2048,
+    presence_penalty: 0,
+    response_format: {
+      type: "text",
+    },
+    stop: null,
+    stream: false,
+    stream_options: null,
+    temperature: 1,
+    top_p: 1,
+    tools: null,
+    tool_choice: "none",
+    logprobs: false,
+    top_logprobs: null,
+  },
 };
 
 const configemini = {
@@ -140,28 +179,29 @@ function handleStreamResponseGemini(response: AxiosResponse, socket: any) {
 
 export const getAIResponse = (SocketId: any, data: any) => {
   let ai = data.model;
-  let config:any = "";
-  if(ai == "deepseek"){
-      configdeepseek.data.messages[0].content = data.message;
-      config = configdeepseek;
-  }else if(ai == "gemini"){
+  let config: any = "";
+  if (ai == "deepseek") {
+    configdeepseek.data.messages[0].content = data.message;
+    config = configdeepseek;
+  } else if (ai == "gemini") {
     configemini.data.contents[0].parts[0].text = data.message;
     config = configemini;
   }
   axios(config)
     .then((response) => {
       let steamresponse;
-      if(ai == "deepseek"){
-        steamresponse = handleStreamResponseDeepseek(response, getSocketByUserId(SocketId));
-      }
-      else if(ai == "gemini"){
+      if (ai == "deepseek") {
+        steamresponse = handleStreamResponseDeepseek(
+          response,
+          getSocketByUserId(SocketId)
+        );
+      } else if (ai == "gemini") {
         steamresponse = handleStreamResponseGemini(
-        response,
-        getSocketByUserId(SocketId)
-      );
-      }
-      else{
-        steamresponse =  handlestreamResponseLocal(getSocketByUserId(SocketId));
+          response,
+          getSocketByUserId(SocketId)
+        );
+      } else {
+        steamresponse = handlestreamResponseLocal(getSocketByUserId(SocketId));
       }
       return steamresponse;
     })

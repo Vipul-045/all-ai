@@ -12,7 +12,7 @@ export const createUser = async (bodydata: any) => {
       email: bodydata.email,
       passwordhash: hashedpassword,
     });
-    const addeduser = user.save(); // user added
+    const addeduser = await user.save(); // user added
 
     return addeduser;
   } catch (err) {

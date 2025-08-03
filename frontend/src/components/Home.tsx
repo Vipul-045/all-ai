@@ -11,14 +11,34 @@ const HomeData = () => {
     const [inputvalue, setInputvalue] = useState("");
     const [outputValue, setOutPutValue] = useState("");
     const [selectedModel, setSelectedModel] = useState("deepseek");
+   const [messages, setMessages] = useState<{ type: 'user' | 'system'; content: string }[]>([]);
+const [rawSystemText, setRawSystemText] = useState(""); // hold raw unformatted stream
 
-    const listener = async (msg: { message: string }) => {
-        console.log("chunks :-", msg);
+const listener = async (msg: { message: string }) => {
+  const incoming = msg.message; // incoming chunk, e.g., "Hello"
+  
+  // 1. Append incoming chunk to raw system text
+  setRawSystemText(prevRaw => prevRaw + incoming);
 
-        const formated_data = await formatOutput(msg.message);
-        console.log("formated_data", formated_data);
-        setOutPutValue(prev => prev + formated_data);
-    };
+  // 2. Format just this chunk and append it to the last message
+  const formatted = await formatOutput(incoming); // format only current chunk
+
+  setMessages(prev => {
+    const updated = [...prev];
+    const last = updated[updated.length - 1];
+
+    if (last?.type === 'system') {
+      updated[updated.length - 1] = {
+        ...last,
+        content: last.content + formatted // append the chunk
+      };
+    }
+
+    return updated;
+  });
+};
+
+
 
 
     useEffect(() => {
@@ -31,54 +51,94 @@ const HomeData = () => {
         };
     }, []);
 
+    function handleSend() {
+
+        
+        if (inputvalue.trim() === '') return;
+
+        
+
+        const userMsg = { type: 'user', content: inputvalue };
+        setMessages(prev => [...prev, userMsg]);
+
+        setInputvalue('');
+
+        SendInputText(inputvalue, selectedModel);
+
+        const systemReply = {
+            type: 'system',
+            content: parse(outputValue),
+        };
+        setTimeout(() => {
+            setMessages(prev => [...prev, systemReply]);
+        });
+
+        setRawSystemText("");
+    }
+
 
     return <>
-        <div className="h-screen min-w-screen flex flex-col items-center bg-#F4F6F8">
+        <div className="h-screen w-screen flex flex-col items-center bg-[#F4F6F8]">
             <Header />
-            <div className="flex flex-col items-center justify-center h-screen w-full">
-                <div className={outputValue ? "max-w-4/6 h-full flex justify-center px-4 py-3 space-y-4" : "max-w-4/6 flex justify-center px-4 py-3 space-y-4"}>
-                    <p className="flex overflow-y-auto flex-col items-center justify-center">
-                        <span className="pb-10 font-semibold text-left">
-                            {parse(outputValue)}
-                        </span>
-                        <span className="pb-10 h-full text-2xl font-semibold text-center text-blue-300">
-                            {!outputValue ? "Hello! How can I help you today?" : ""}
-                        </span>
-                    </p>
+
+            {/* Chat area */}
+            <div className="flex flex-col justify-between w-full max-w-4xl px-4 py-6" style={{height:'80vh',flexGrow:1,overflowY: 'scroll',scrollBehavior: 'smooth',scrollbarWidth: 'none'}}>
+
+                {/* Messages */}
+                <div className="flex flex-col gap-4 overflow-y-auto flex-1 px-2">
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                            <div
+                                className={`px-4 py-3 rounded-2xl max-w-[70%] text-sm
+          ${msg?.type === 'user' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}`}
+                            >
+                                {parse(String(msg?.content || ""))}
+                            </div>
+                        </div>
+                    ))}
+
+                    {!messages.length && (
+                        <div className="flex justify-center text-blue-400 text-xl font-semibold mt-8">
+                            Hello! How can I help you today?
+                        </div>
+                    )}
                 </div>
-                <div className="border-black border-1 min-w-2/4 flex justify-between">
+
+
+                {/* Input area */}
+                <div className="mt-4 flex items-center justify-between border-t pt-4 gap-4">
+                    {/* Select model */}
                     <select
                         value={selectedModel}
                         onChange={(e) => setSelectedModel(e.target.value)}
-                        className="border px-3 py-2 rounded"
+                        className="border border-gray-300 px-3 py-2 rounded-md text-sm"
                     >
                         <option value="deepseek">DeepSeek</option>
                         <option value="gemini">Gemini</option>
                     </select>
-                    <div className="items-center space-x-2 flex">
-                        <input
-                            className="bg-#FFFFFF w-3xl hover:bg-gray-900 text-#1F2937 px-4 py-4 text-md"
-                            value={inputvalue}
-                            placeholder="What do you want to know..."
-                            onChange={(e) => setInputvalue(e.target.value)}
-                        />
-                    </div>
+
+                    {/* Input box */}
+                    <input
+                        value={inputvalue}
+                        onChange={(e) => setInputvalue(e.target.value)}
+                        placeholder="What do you want to know..."
+                        className="flex-1 border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none"
+                    />
+
+                    {/* Button */}
                     <button
-                        className="bg-#1F2937 hover:bg-gray-900 text-white font-bold py-2 px-4"
-                        onClick={() => {
-                            if (inputvalue.trim() === "") {
-                                alert("Please enter a valid input.");
-                                return;
-                            }
-                            SendInputText(inputvalue, selectedModel);
-                            setInputvalue("");
-                        }}
+                        onClick={handleSend}
+                        className="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-md text-sm font-semibold"
                     >
                         Let's go!
                     </button>
                 </div>
             </div>
         </div>
+
     </>
 }
 
