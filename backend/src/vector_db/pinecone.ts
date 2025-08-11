@@ -7,8 +7,7 @@ export async function run(): Promise<void> {
   const indexName = process.env.PINECONE_INDEX_NAME!;
   
   const existingIndexes = await pc.listIndexes();
-  const indexesList = existingIndexes.indexes ?? []; // ✅ ensure it's an array
-
+  const indexesList = existingIndexes.indexes ?? []; 
   if (!indexesList.some(idx => idx.name === indexName)) {
     console.log(`Creating index: ${indexName}`);
     await pc.createIndex({
