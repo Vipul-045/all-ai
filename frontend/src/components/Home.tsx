@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
-import { SendInputText } from "../services/InputData_Controller";
 import socket from "../services/socket";
 import Header from "./header";
+import InputArea from "./InputArea";
 import { formatOutput } from "../services/OutPutformater";
 import parse from 'html-react-parser';
 
 
 const HomeData = () => {
-
-    const [inputvalue, setInputvalue] = useState("");
     const [outputValue, setOutPutValue] = useState("");
 
     const listener = async (msg: { message: string }) => {
@@ -45,7 +43,7 @@ const HomeData = () => {
                         </span>
                     </p>
                 </div>
-                <div className="border-black border-1 min-w-2/4 flex justify-between">
+                {/* <div className="border-black border-1 min-w-2/4 flex justify-between">
                     <div className="items-center space-x-2 flex">
                         <input
                             className="bg-#FFFFFF w-3xl hover:bg-gray-900 text-#1F2937 px-4 py-4 text-md"
@@ -67,7 +65,8 @@ const HomeData = () => {
                     >
                         Let's go!
                     </button>
-                </div>
+                </div> */}
+                <InputArea />
             </div>
         </div>
     </>
