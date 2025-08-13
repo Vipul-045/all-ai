@@ -50,16 +50,16 @@ io.on("connection", (socket) => {
   });
 });
 
-const getrespone = async () =>{
-  try {
-    const response = await getAIImageResponse("how are you");
-    console.log("respsone",response);
-  } catch (error) {
-    console.error("Error fetching AI response:", error);
-  }
-}
+// const getrespone = async () =>{
+//   try {
+//     const response = await getAIImageResponse("how are you");
+//     console.log("respsone",response);
+//   } catch (error) {
+//     console.error("Error fetching AI response:", error);
+//   }
+// }
 
-getrespone();
+// getrespone();
 
 
 server.listen(3000,'0.0.0.0', () => {
