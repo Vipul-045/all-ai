@@ -1,25 +1,25 @@
 import mongoose, { Model, Schema, Types } from "mongoose";
 
 interface ISubscription extends mongoose.Document {
-  userId: Types.ObjectId;
+  email: string;
   planName: string;
   status?: "active" | "cancelled" | "expired" | "trial";
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string;
+  endDate?: string;
   isAutoRenew?: boolean;
 }
 
 const SubscriptionSchema = new mongoose.Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    email: { type:String, required: true },
     planName: { type: String, required: true }, // e.g., "Basic", "Pro"
     status: {
       type: String,
       enum: ["active", "cancelled", "expired", "trial"],
       default: "active",
     },
-    startDate: { type: Date, default: Date.now },
-    endDate: { type: Date },
+    startDate: { type: String, default: Date.now },
+    endDate: { type: String },
     isAutoRenew: { type: Boolean, default: true },
   },
   {

@@ -27,6 +27,7 @@ dbconnection()
     console.log("MongoDB connected successfully");
   })
   .catch((err) => {
+    console.log("err",err);
     console.log("erro while connecting db");
   });
 

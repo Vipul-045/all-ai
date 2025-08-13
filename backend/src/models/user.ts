@@ -3,12 +3,14 @@ import mongoose, { Model } from "mongoose";
 interface IUser extends mongoose.Document {
   email: string;
   passwordhash: string;
+  userRole:string;
 }
 
 const UserSchema = new mongoose.Schema(
   {
     email: String,
     passwordhash: String,
+    userRole: String
   },
   {
     timestamps: true,

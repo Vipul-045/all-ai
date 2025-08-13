@@ -20,7 +20,7 @@ let finalformatedresult = '';
 
 export const formatOutput = (chuckData: string) => {
     finalformatedresult = "";
-    murgetwochuckattime(chuckData);
+    murgetwochuckattime(chuckData); //"**gravity"
     murgedchucksarry.forEach((chuck: string) => {
         finalformatedresult = headingFormater(chuck);
         finalformatedresult = unorderlist(finalformatedresult);
@@ -28,6 +28,7 @@ export const formatOutput = (chuckData: string) => {
         finalformatedresult = formulablock(finalformatedresult);
         murgedchucksarry.pop();
         finalformatedresult = boldFormater(finalformatedresult);
+        console.log("finalformtedresult",finalformatedresult);
     })
     return Promise.resolve(finalformatedresult);
 };
@@ -64,6 +65,8 @@ function murgetwochuckattime(chuckData: string) {
         isBlockFormulaForMerge = false;
         currentchuck = "";
     }
+
+    
 
 
     //add every value with currentchuck
