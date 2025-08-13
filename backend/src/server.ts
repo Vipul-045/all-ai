@@ -11,6 +11,17 @@ const server = http.createServer(app);
 const cors = require("cors");
 const port = process.env.PORT || 3000;
 
+import { Pinecone } from '@pinecone-database/pinecone';
+import { embeidingtranform, run, searchText, storeText } from "./vector-db/pinecone_vector";
+
+const pc = new Pinecone({
+  apiKey: process.env.pinecone_db_key || 'pcsk_41NUFz_KZrAgWgFhkdczp1Yh7QDXFbPKSj49Stu5aLoRGGCFsnFffMvzZNEMqRhc7DkCzY'
+});
+const index = pc.index('all-ai');
+
+console.log("index",index);
+
+
 app.use(cors());
 app.use(express.json());
 
@@ -56,9 +67,24 @@ io.on("connection", (socket) => {
   });
 });
 
+
 app.get('',(req,res)=>{
   res.status(200).send({'message':"get request is working"});
 })
+// embeidingtranform().then(()=>{
+// run().then(()=>{
+//   //  storeText("4","i am graduated from asmita college");
+//    searchText("where i studied");
+// }).catch(err=>{
+//   console.error("Error:", err);
+// })
+// }).catch(err => {
+//   console.error('Error:', err);
+// });
+
+
+
+
 
 server.listen(3000,'0.0.0.0', () => {
   console.log("Socket server running on http://localhost:3000");

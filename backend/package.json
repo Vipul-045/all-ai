@@ -12,6 +12,7 @@
     "build-start": "npm run build && node dist/server.js"
   },
   "dependencies": {
+    "@pinecone-database/pinecone": "^6.1.2",
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.29",
     "axios": "^1.9.0",

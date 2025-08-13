@@ -28,7 +28,6 @@ export const formatOutput = (chuckData: string) => {
         finalformatedresult = formulablock(finalformatedresult);
         murgedchucksarry.pop();
         finalformatedresult = boldFormater(finalformatedresult);
-        console.log("finalformtedresult",finalformatedresult);
     })
     return Promise.resolve(finalformatedresult);
 };
@@ -61,7 +60,6 @@ function murgetwochuckattime(chuckData: string) {
     }
     else {
         murgedchucksarry.push(currentchuck + chuckData);
-        console.log("chuckData_Passing", chuckData);
         isBlockFormulaForMerge = false;
         currentchuck = "";
     }
@@ -79,7 +77,6 @@ function headingFormater(chuckData: string): string {
     //chuckData ### **2. isheading ###
 
     while (chuckData.includes("#")) {
-        console.log("isheading",isheading);
         if (!isheading.includes("#")) {
             headingMatch = chuckData.match(/(.*?)\s*(#{1,6})\s*(.+?)\s*$/);
         }
@@ -119,7 +116,6 @@ function headingFormater(chuckData: string): string {
             }
 
         }
-        console.log("chuckData", chuckData, "isheading", isheading);
 
     }
 
@@ -159,7 +155,6 @@ function unorderlist(chuckData: string): string {
     while (/(\s+-|\s+-\s+|-\s+)/g.test(chuckData)) {
         if (!isUnOrdernext) {
             isUnOrdernext = true
-            console.log("UnOrderLIstCount", UnOrderListCount);
             if (UnOrderListCount == 0) {
                 chuckData = chuckData.replace(/\s*-\s*/, "<ul><li>");
             } else {

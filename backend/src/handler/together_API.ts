@@ -2,6 +2,7 @@ import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import { getSocketByUserId } from "./socket_handler";
 
 import * as zlib from "zlib";
+import { embeidingtranform, run, searchText } from "../vector-db/pinecone_vector";
 require("dotenv").config();
 
 const API_KEY = process.env.TOGETHER_API_KEY;
@@ -19,7 +20,7 @@ const configdeepseek = {
   data: {
     model: "deepseek-ai/DeepSeek-V3",
     stream: true,
-    messages: [{ role: "user", content: "how are you" }],
+    messages: [{ role: "user", content: "how are you" },{ role: "user", content: "how are you" }],
     context_length_exceeded_behavior: "truncate",
   },
   responseType: "stream" as const,
@@ -177,11 +178,22 @@ function handleStreamResponseGemini(response: AxiosResponse, socket: any) {
 //     });
 // };
 
-export const getAIResponse = (SocketId: any, data: any) => {
-  let ai = data.model;
+export const getAIResponse = (SocketId: any, AIdata: any) => {
+  let ai = AIdata.model;
   let config: any = "";
-  if (ai == "deepseek") {
-    configdeepseek.data.messages[0].content = data.message;
+
+  embeidingtranform().then(()=>{
+run().then(()=>{
+  //  storeText("4","i am graduated from asmita college");
+   searchText(AIdata.message).then((data)=>{
+    // let userquary = `${data[0].metadata.text}\n\n User's question: ${data.message}`;
+   let userquary = AIdata.message
+    if (ai == "deepseek") {
+
+    configdeepseek.data.messages[0].role = "system";
+    configdeepseek.data.messages[0].content = data[0].metadata.text;
+    configdeepseek.data.messages[1].role = "user";
+    configdeepseek.data.messages[1].content = userquary;
     config = configdeepseek;
   } else if (ai == "gemini") {
     configemini.data.contents[0].parts[0].text = data.message;
@@ -209,6 +221,18 @@ export const getAIResponse = (SocketId: any, data: any) => {
       console.error("Error in getAIResponse:", error);
       throw new Error("Failed to fetch AI response from Together API");
     });
+   }).catch((err)=>{
+    console.log("error while searching",err);
+   })
+   
+}).catch(err=>{
+  console.error("Error:", err);
+})
+}).catch(err => {
+  console.error('Error:', err);
+});
+
+  
 };
 
 function handlestreamResponseLocal(socket: any) {

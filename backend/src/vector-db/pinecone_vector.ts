@@ -1,0 +1,116 @@
+import "dotenv/config";
+import { Pinecone } from "@pinecone-database/pinecone";
+import { matchesGlob } from "path";
+
+const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
+
+let extractor: any;
+let index: any;
+
+const TARGET_DIM = 2688;
+
+export async function run() {
+  const indexName = process.env.PINECONE_INDEX_NAME!;
+
+  const existingIndexes = await pc.listIndexes();
+  const indexesList = existingIndexes.indexes ?? [];
+
+  const sampleEmbedding = await extractor("My Name is Neeraj");
+  const DIMENSION = sampleEmbedding.data.length;
+
+  if (!indexesList.some((idx) => idx.name === indexName)) {
+    console.log(`Creating index: ${indexName}`);
+    await pc.createIndex({
+      name: indexName,
+      dimension: DIMENSION, // vector length
+      metric: "cosine",
+      spec: { serverless: { cloud: "aws", region: "us-east-1" } },
+    });
+
+    console.log("Waiting for index to be ready...");
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+  }
+
+  index = pc.index(indexName);
+  return index;
+}
+
+export async function storeText(id: string, text: string) {
+  const embedding = await extractor(text);
+  const vector = Array.from(embedding.data); // Convert to plain array
+
+  const normalizedVector = normalizeVector(vector, TARGET_DIM);
+
+  await index.upsert([
+    {
+      id,
+      values: normalizedVector,
+      metadata: { text },
+    },
+  ]);
+
+  console.log(`✅ Stored: "${text}"`);
+}
+
+export async function searchText(query: any, topK = 1) {
+  const embedding = await extractor(query);
+  const vector = Array.from(embedding.data);
+
+  const normalizedVector = normalizeVector(vector, TARGET_DIM);
+
+  const queryResponse = await index.query({
+    vector: normalizedVector,
+    topK: topK,
+    includeMetadata: true,
+  });
+
+  const foundata:any = [];
+
+  (queryResponse.matches ?? []).forEach((match: any) => {
+    console.log(`ID: ${match.id}, Score: ${match.score}`);
+    console.log("Metadata:", match.metadata);
+
+    foundata.push({
+      id: match.id,
+      score: match.score,
+      metadata: match.metadata,
+    });
+  });
+
+  return foundata;
+}
+
+function normalizeVector(vec: any, targetDim: any) {
+  const currentDim = vec.length;
+
+  if (currentDim === targetDim) {
+    return vec; // already correct
+  }
+
+  if (currentDim > targetDim) {
+    // Too long → trim
+    return vec.slice(0, targetDim);
+  }
+
+  // Too short → pad with zeros
+  const padded = new Array(targetDim).fill(0);
+  for (let i = 0; i < currentDim; i++) {
+    padded[i] = vec[i];
+  }
+  return padded;
+}
+
+export async function embeidingtranform() {
+  try {
+    // This will remain as import() in compiled JS
+    const TransformersApi = Function('return import("@xenova/transformers")')();
+    const { pipeline } = await TransformersApi;
+
+    extractor = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+
+    return extractor;
+  } catch (err) {
+    console.error("Error while transforming:", err);
+    throw err;
+  }
+}

@@ -1,8 +1,7 @@
 import { io } from 'socket.io-client';
 
-// const BackendLink = "http://192.168.58.41:3000";
-const BackendLink = 'http://localhost:3000';
-// const BackendLink = 'http://52.91.129.61:3000';
+const BackendLink = import.meta.env.VITE_API_BackendBaseUrl;
+console.log("BackendLInk",BackendLink);
 
 const socket = io(BackendLink); // Replace with your server URL
 

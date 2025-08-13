@@ -42,8 +42,8 @@ const listener = async (msg: { message: string }) => {
 
 
     useEffect(() => {
-        // console.log("converted",myConvertLatex("6.674 \\times 10^{-11} \\, \\text{N} \\cdot \\text{m}^2/\\text{kg}^2"));
-        console.log("output on line data");
+        setOutPutValue("");
+        console.log(rawSystemText);
         socket.on("live-data", listener);
 
         return () => {
@@ -58,19 +58,15 @@ const listener = async (msg: { message: string }) => {
 
         
 
-        const userMsg = { type: 'user', content: inputvalue };
-        setMessages(prev => [...prev, userMsg]);
+        setMessages(prev => [...prev, { type: 'user', content: inputvalue }]);
 
         setInputvalue('');
 
         SendInputText(inputvalue, selectedModel);
 
-        const systemReply = {
-            type: 'system',
-            content: parse(outputValue),
-        };
+        
         setTimeout(() => {
-            setMessages(prev => [...prev, systemReply]);
+            setMessages(prev => [...prev, {type: 'system',content: outputValue}]);
         });
 
         setRawSystemText("");
