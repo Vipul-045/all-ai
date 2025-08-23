@@ -2,10 +2,13 @@ import { Request, Response, Router } from "express";
 import { createUser, loginuser } from "../handler/routes_handler/user_handler";
 import { CreateSubscription, GetSubscription, GetSubscriptionById, UpdateSubscriptionById } from "../handler/routes_handler/Sub_handler";
 const multer = require("multer");
+import jwt from "jsonwebtoken";
+require("dotenv").config();
 
 const mymulter = multer();
 
 const Urouter = Router();
+const secratKey = process.env.SecratKey || "";
 
 Urouter.post("", mymulter.none(), async (req: Request, res: Response) => {
   try {
@@ -19,6 +22,43 @@ Urouter.post("", mymulter.none(), async (req: Request, res: Response) => {
     res.status(500).send({ error: "Error while creating user" });
   }
 });
+
+Urouter.get("", mymulter.none(), async (req: Request, res: Response) => {
+  const token = req.cookies.app_token;
+  console.log("found token",token);
+  if (!token) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(token, secratKey);
+    if (typeof decoded === "object" && decoded !== null) {
+      res.status(200).send({ userId: decoded.sub, email: decoded.email, name: decoded.name, picture: decoded.picture });
+    } else {
+      res.status(403).json({ error: "Invalid token payload" });
+    }
+  } catch (err) {
+    res.status(403).json({ error: "Invalid or expired token" });
+  }
+});
+
+Urouter.post('/logout',mymulter.none(), async (req:Request, res:Response)=>{
+  try{
+    console.log("in logtout");
+    console.log("const token = req.cookies.app_token;"+req.cookies.app_token);
+    res.clearCookie("app_token", {
+        httpOnly: true,
+        secure:true,
+        sameSite: "none"
+        // maxAge: 0 or expires: new Date(0) is implicitly handled by clearCookie().
+    });
+    res.status(200).json({ message: "Logged out" });
+  }catch(err){
+    const errorMessage = typeof err === "object" && err !== null && "message" in err ? (err as { message: string }).message : "Unknown error";
+    res.status(500).json({ message: errorMessage });
+  }
+})
 
 Urouter.post("/login", mymulter.none(), async (req: Request, res: Response) => {
   try {

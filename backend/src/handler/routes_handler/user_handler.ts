@@ -6,11 +6,15 @@ require("dotenv").config();
 
 export const createUser = async (bodydata: any) => {
   try {
-    const hashedpassword = await bcrypt.hash(bodydata.passwordhash, 10); // hass password
+    // const hashedpassword = await bcrypt.hash(bodydata.passwordhash, 10); // hass password
 
     const user = new UserModel({
-      email: bodydata.email,
-      passwordhash: hashedpassword,
+      id : bodydata.id,
+      name : bodydata.name,
+      given_name : bodydata.given_name,
+      picture : bodydata.picture,
+      email : bodydata.email,
+      email_verified: bodydata.email_verified
     });
     const addeduser = await user.save(); // user added
 
@@ -52,3 +56,7 @@ export const loginuser = async (bodydata: any) => {
     throw new Error("Error while Login User");
   }
 };
+export const findUserById = async (id:any) =>{
+    const userfound: any = await UserModel.findOne({id:id});
+    return userfound;
+}

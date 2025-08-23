@@ -35,24 +35,33 @@ export async function run() {
   return index;
 }
 
-export async function storeText(id: string, text: string) {
+export async function storeText(text: string) {
   const embedding = await extractor(text);
   const vector = Array.from(embedding.data); // Convert to plain array
+  const foundmatching:any = searchText(text,1);
+  foundmatching.then(async (foundmatch:any)=>{
+        if(foundmatch.length != 0 && foundmatch[0]?.score >= 0.98){
+            console.log("data did not stoed .. score matched all ready");
+            return;
+        }
 
-  const normalizedVector = normalizeVector(vector, TARGET_DIM);
+        const normalizedVector = normalizeVector(vector, TARGET_DIM);
 
-  await index.upsert([
-    {
-      id,
-      values: normalizedVector,
-      metadata: { text },
-    },
-  ]);
+        await index.upsert([
+          {
+            id:`doc-123_${new Date().toISOString().replace(/[-:TZ.]/g, '')}`,
+            values: normalizedVector,
+            metadata: { text:text,created_at: new Date().toISOString() },
+          },
+        ]);
 
   console.log(`✅ Stored: "${text}"`);
+  })
+  
+  
 }
 
-export async function searchText(query: any, topK = 1) {
+export async function searchText(query: any, topK:any) {
   const embedding = await extractor(query);
   const vector = Array.from(embedding.data);
 
@@ -66,6 +75,10 @@ export async function searchText(query: any, topK = 1) {
 
   const foundata:any = [];
 
+  // const latest = queryResponse.matches.sort(
+  // (a:any, b:any) => new Date(b.metadata.created_at).getTime() - new Date(a.metadata.created_at).getTime())[0];
+
+
   (queryResponse.matches ?? []).forEach((match: any) => {
     console.log(`ID: ${match.id}, Score: ${match.score}`);
     console.log("Metadata:", match.metadata);
@@ -76,6 +89,8 @@ export async function searchText(query: any, topK = 1) {
       metadata: match.metadata,
     });
   });
+
+  console.log("founded",foundata);
 
   return foundata;
 }

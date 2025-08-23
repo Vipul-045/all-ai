@@ -55,3 +55,25 @@ justify-content: flex-end;
 .chat-button:hover {
   background-color: #0056b3;
 } */
+
+
+.code-card {
+      background-color: #646464;   /* Dark background like VS Code */
+      color: #f8f8f2;              /* Light text */
+      padding: 16px;
+      border-radius: 12px;
+      font-family: "Fira Code", monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      box-shadow: 0 4px 12px rgba(58, 58, 58, 0.3);
+      overflow-x: auto;           /* Scroll if long code */
+      margin: 20px 0;
+      border: 1px solid #333;
+    }
+    .code-card::-webkit-scrollbar {
+      height: 6px;
+    }
+    .code-card::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 3px;
+    }

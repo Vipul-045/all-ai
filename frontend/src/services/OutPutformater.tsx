@@ -5,6 +5,7 @@ let currenttype: string = '';
 let isheading: string = '';
 let islist: boolean = false;
 let isBlockFormula: boolean = false;
+let isBlockCode: boolean = false;
 let isinlineFormula: boolean = false;
 let isBlockFormulaForMerge: boolean = false;
 let checkboolean = false;
@@ -26,6 +27,8 @@ export const formatOutput = (chuckData: string) => {
         finalformatedresult = unorderlist(finalformatedresult);
         finalformatedresult = orderlist(finalformatedresult);
         finalformatedresult = formulablock(finalformatedresult);
+        finalformatedresult = codeblock(finalformatedresult);
+
         murgedchucksarry.pop();
         finalformatedresult = boldFormater(finalformatedresult);
     })
@@ -221,6 +224,22 @@ function formulablock(chuckData: string): string {
     while (chuckData.includes("\\)") && isinlineFormula) {
         isinlineFormula = false;
         chuckData = chuckData.replace("\\)", "</span>");
+    }
+
+    return chuckData;
+}
+
+function codeblock(chuckData: string): string {
+    // chuckDat = " - , '-', '- sdf'"
+    while (chuckData.includes('```') && !isBlockCode) {
+        // chuckData = FormulaMatch(chuckData);
+
+        isBlockCode = true;
+        chuckData = chuckData.replace('```', "<pre class='code-card'>");
+    }
+    while (chuckData.includes('```') && isBlockCode) {
+        isBlockCode = false;
+        chuckData = chuckData.replace('```', "</pre>");
     }
 
     return chuckData;
