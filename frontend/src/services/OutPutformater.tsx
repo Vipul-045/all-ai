@@ -1,6 +1,7 @@
 import katex from "katex";
 import 'katex/dist/katex.min.css';
 
+
 let currenttype: string = '';
 let isheading: string = '';
 let islist: boolean = false;
@@ -23,14 +24,16 @@ export const formatOutput = (chuckData: string) => {
     finalformatedresult = "";
     murgetwochuckattime(chuckData); //"**gravity"
     murgedchucksarry.forEach((chuck: string) => {
-        finalformatedresult = headingFormater(chuck);
-        finalformatedresult = unorderlist(finalformatedresult);
-        finalformatedresult = orderlist(finalformatedresult);
-        finalformatedresult = formulablock(finalformatedresult);
-        finalformatedresult = codeblock(finalformatedresult);
+        // finalformatedresult = headingFormater(chuck);
+        // finalformatedresult = horizontaldevider(finalformatedresult);
+        // finalformatedresult = unorderlist(finalformatedresult);
+        // finalformatedresult = orderlist(finalformatedresult);
+        // finalformatedresult = formulablock(finalformatedresult);
+        // finalformatedresult = codeblock(finalformatedresult);
+        // finalformatedresult = boldFormater(finalformatedresult);
+        finalformatedresult = chuck;
 
         murgedchucksarry.pop();
-        finalformatedresult = boldFormater(finalformatedresult);
     })
     return Promise.resolve(finalformatedresult);
 };
@@ -43,9 +46,12 @@ function murgetwochuckattime(chuckData: string) {
     else if (chuckData.includes("#")) {
         currentchuck += chuckData;
     }
-    // else if (chuckData.includes("-")) {
-    //     currentchuck += chuckData;
-    // }
+    else if(chuckData.includes('`')){
+        currentchuck += chuckData
+    }
+    else if (chuckData.includes("-")) {
+        currentchuck += chuckData;
+    }
     else if (chuckData.includes("\\") || !isBlockFormulaForMerge && checkboolean) {
         currentchuck += chuckData;
         checkboolean = true;
@@ -152,10 +158,21 @@ function boldFormater(chuckData: string): string {
     return chuckData;
 }
 
+function horizontaldevider(chuckData: string): string {
+    // chuckDat = " - , '-', '- sdf'"
+
+    while ((chuckData).includes('---') && !isBlockCode) {
+                chuckData = chuckData.replace('---', '<hr class="horizontalDevider">');
+    }
+
+
+    return chuckData;
+}
+
 function unorderlist(chuckData: string): string {
     // chuckDat = " - , '-', '- sdf'"
 
-    while (/(\s+-|\s+-\s+|-\s+)/g.test(chuckData)) {
+    while (/(\s+-|\s+-\s+|-\s+)/g.test(chuckData) && !isBlockCode) {
         if (!isUnOrdernext) {
             isUnOrdernext = true
             if (UnOrderListCount == 0) {

@@ -6,7 +6,7 @@ var socket = io("http://127.0.0.1:3000", {
 socket.on("connect", function () {
     console.log("Connected to server:", socket.id);
     // socket.emit("test", "hello test");
-    socket.emit("input", "hello google gemini");
+    socket.emit("input", "hello google gemini", "deepseek");
     socket.on("live-data", function (data) {
         console.log(data);
     });

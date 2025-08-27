@@ -8,6 +8,9 @@ import { dbconnection } from "./db/db_connection";
 import { Pinecone } from "@pinecone-database/pinecone";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
+import session from 'express-session';
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 import {
@@ -20,6 +23,7 @@ import {
   createUser,
   findUserById,
 } from "./handler/routes_handler/user_handler";
+import { connectredis, redis } from "./redish-connect/redis-tools";
 
 declare global {
   namespace Express {
@@ -32,7 +36,7 @@ declare global {
 // GoogleOAuth
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const session = require("express-session");
+const Esession = require("express-session");
 // GoogleOAuth
 
 require("dotenv").config();
@@ -46,6 +50,20 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(cookieParser());
+
+const sessionMiddleware = 
+  Esession({
+  secret:'MYsecret',
+  resave:false,
+  saveUninitialized: true,
+  cookie: { 
+    maxAge: 1000 * 60 * 60, /// wait for 1hr
+    secure: false,
+    httpOnly: true
+  } // Set to `true` for HTTPS
+});
+
+app.use(sessionMiddleware);
 
 const YOUR_GOOGLE_CLIENT_ID = process.env.YOUR_GOOGLE_CLIENT_ID;
 const YOUR_GOOGLE_CLIENT_SECRET = process.env.YOUR_GOOGLE_CLIENT_SECRET;
@@ -150,10 +168,16 @@ app.get(
 );
 
 const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: { origin: Frontend_URl,credentials: true },
+});
+
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, next);
 });
 
 let userId: any;
+
+connectredis();
 
 dbconnection()
   .then((data) => {
@@ -174,7 +198,7 @@ io.on("connection", (socket) => {
   addUserSocket(socket.id, socket);
 
   socket.on("input", (data) => {
-    getAIResponse(socket.id, data);
+    getAIResponse(socket, data);
   });
 
   socket.on("test", (data) => {

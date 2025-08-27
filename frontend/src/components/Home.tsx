@@ -4,6 +4,9 @@ import socket from "../services/socket";
 import Header from "./header";
 import { formatOutput } from "../services/OutPutformater";
 import parse from 'html-react-parser';
+
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import "./home.css";
 
 const HomeData = () => {
@@ -95,9 +98,12 @@ const HomeData = () => {
                         >
                             <div
                                 className={`px-4 py-3 rounded-2xl max-w-[70%] text-sm
-          ${msg?.type === 'user' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}`}
+          ${msg?.type === 'user' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800 System-chat'}`}
                             >
-                                {parse(String(msg?.content || ""))}
+                               
+                                {<ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {String(msg?.content || "").replace(/^\s+/gm, "")}
+                                </ReactMarkdown>}
                             </div>
                         </div>
                     ))}
